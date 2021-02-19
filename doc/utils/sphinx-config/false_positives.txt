@@ -508,6 +508,7 @@ cpp
 cpu
 createatoms
 createAtoms
+CreateIDs
 crespi
 Crespi
 Critchley
@@ -597,6 +598,7 @@ Dcut
 de
 dE
 De
+deallocated
 decorrelation
 debye
 Debye
@@ -787,6 +789,7 @@ ees
 eFF
 efield
 effm
+eflag
 eflux
 eg
 Eggebrecht
@@ -2294,6 +2297,7 @@ omegaz
 Omelyan
 omp
 OMP
+oneAPI
 onelevel
 oneway
 onn
@@ -2525,6 +2529,7 @@ ptm
 PTM
 ptol
 ptr
+PTX
 pu
 purdue
 Purohit
@@ -2537,6 +2542,8 @@ Px
 pxx
 Pxx
 Pxy
+pxy
+pxz
 py
 Py
 pydir
@@ -2548,10 +2555,13 @@ pymol
 pypar
 pythonic
 pytorch
+pyy
 Pyy
+pyz
 pz
 Pz
 Pzz
+pzz
 qbmsst
 qcore
 qdist
@@ -2680,6 +2690,7 @@ rfile
 rg
 Rg
 Rhaphson
+Rhe
 rheological
 rheology
 rhodo
@@ -3334,6 +3345,7 @@ verlet
 Verlet
 versa
 ves
+vflag
 vhi
 vibrational
 Vij
