@@ -33,6 +33,7 @@ class PairTersoff : public Pair {
   void coeff(int, char **);
   virtual void init_style();
   double init_one(int, int);
+  virtual void *extract(const char *, int &);
 
   template <int SHIFT_FLAG, int EVFLAG, int EFLAG, int VFLAG_ATOM>
   void eval();
@@ -68,7 +69,8 @@ class PairTersoff : public Pair {
   int maxparam;                 // max # of parameter sets
   int maxshort;                 // size of short neighbor list array
   int *neighshort;              // short neighbor list array
-
+  double **scale;
+  
   int shift_flag;               // flag to turn on/off shift
   double shift;                 // negative change in equilibrium bond length
 

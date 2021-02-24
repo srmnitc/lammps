@@ -33,6 +33,7 @@ class PairSW : public Pair {
   virtual void coeff(int, char **);
   virtual double init_one(int, int);
   virtual void init_style();
+  virtual void *extract(const char *, int &);
 
   static constexpr int NPARAMS_PER_LINE = 14;
 
@@ -59,7 +60,8 @@ class PairSW : public Pair {
   Param *params;                // parameter set for an I-J-K interaction
   int maxshort;                 // size of short neighbor list array
   int *neighshort;              // short neighbor list array
-
+  double **scale;
+  
   virtual void allocate();
   void read_file(char *);
   virtual void setup_params();

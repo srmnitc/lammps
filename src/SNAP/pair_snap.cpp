@@ -52,6 +52,7 @@ PairSNAP::PairSNAP(LAMMPS *lmp) : Pair(lmp)
   beta = nullptr;
   bispectrum = nullptr;
   snaptr = nullptr;
+  scale = nullptr;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -78,6 +79,7 @@ PairSNAP::~PairSNAP()
     memory->destroy(setflag);
     memory->destroy(cutsq);
     memory->destroy(map);
+    memory->destroy(scale);
   }
 
 }
@@ -186,12 +188,13 @@ void PairSNAP::compute(int eflag, int vflag)
 
       snaptr->compute_deidrj(fij);
 
-      f[i][0] += fij[0];
-      f[i][1] += fij[1];
-      f[i][2] += fij[2];
-      f[j][0] -= fij[0];
-      f[j][1] -= fij[1];
-      f[j][2] -= fij[2];
+      f[i][0] += scale[1][1]*fij[0];
+      f[i][1] += scale[1][1]*fij[1];
+      f[i][2] += scale[1][1]*fij[2];
+      f[j][0] -= scale[1][1]*fij[0];
+      f[j][1] -= scale[1][1]*fij[1];
+      f[j][2] -= scale[1][1]*fij[2];
+
 
       // tally per-atom virial contribution
 
@@ -363,6 +366,7 @@ void PairSNAP::allocate()
   memory->create(setflag,n+1,n+1,"pair:setflag");
   memory->create(cutsq,n+1,n+1,"pair:cutsq");
   memory->create(map,n+1,"pair:map");
+  memory->create(scale,n+1,n+1,"pair:scale");
 }
 
 /* ----------------------------------------------------------------------
@@ -453,6 +457,7 @@ void PairSNAP::coeff(int narg, char **arg)
   for (int i = 1; i <= n; i++)
     for (int j = i; j <= n; j++)
       if (map[i] >= 0 && map[j] >= 0) {
+        scale[i][j] = 1.0;
         setflag[i][j] = 1;
         count++;
       }
@@ -503,6 +508,7 @@ void PairSNAP::init_style()
 double PairSNAP::init_one(int i, int j)
 {
   if (setflag[i][j] == 0) error->all(FLERR,"All pair coeffs are not set");
+  scale[j][i] = scale[i][j];
   return (radelem[map[i]] +
           radelem[map[j]])*rcutfac;
 }
@@ -758,3 +764,9 @@ double PairSNAP::memory_usage()
   return bytes;
 }
 
+void *PairSNAP::extract(const char *str, int &dim)
+{
+  dim = 2;
+  if (strcmp(str,"scale") == 0) return (void *) scale;
+  return NULL;
+}

@@ -48,6 +48,7 @@ PairADP::PairADP(LAMMPS *lmp) : Pair(lmp)
   map = nullptr;
 
   setfl = nullptr;
+  scale = nullptr;
 
   frho = nullptr;
   rhor = nullptr;
@@ -86,6 +87,7 @@ PairADP::~PairADP()
   if (allocated) {
     memory->destroy(setflag);
     memory->destroy(cutsq);
+    memory->destroy(scale);
     delete [] map;
     delete [] type2frho;
     memory->destroy(type2rhor);
@@ -272,6 +274,8 @@ void PairADP::compute(int eflag, int vflag)
                   lambda[i][4]+lambda[i][5]*lambda[i][5]);
       phi -= 1.0/6.0*(lambda[i][0]+lambda[i][1]+lambda[i][2])*
         (lambda[i][0]+lambda[i][1]+lambda[i][2]);
+
+      phi *= scale[1][1];
       if (eflag_global) eng_vdwl += phi;
       if (eflag_atom) eatom[i] += phi;
     }
@@ -375,7 +379,9 @@ void PairADP::compute(int eflag, int vflag)
         fx = delx*fpair+adpx;
         fy = dely*fpair+adpy;
         fz = delz*fpair+adpz;
-
+        fx *= scale[1][1];
+        fy *= scale[1][1];
+        fz *= scale[1][1];
         f[i][0] += fx;
         f[i][1] += fy;
         f[i][2] += fz;
@@ -405,6 +411,7 @@ void PairADP::allocate()
   int n = atom->ntypes;
 
   memory->create(setflag,n+1,n+1,"pair:setflag");
+  memory->create(scale,n+1,n+1,"pair:scale");
   for (int i = 1; i <= n; i++)
     for (int j = i; j <= n; j++)
       setflag[i][j] = 0;
@@ -493,6 +500,7 @@ void PairADP::coeff(int narg, char **arg)
   for (i = 1; i <= n; i++) {
     for (j = i; j <= n; j++) {
       if (map[i] >= 0 && map[j] >= 0) {
+        scale[i][j] = 1.0;
         setflag[i][j] = 1;
         if (i == j) atom->set_mass(FLERR,i,setfl->mass[map[i]]);
         count++;
@@ -530,7 +538,6 @@ double PairADP::init_one(int /*i*/, int /*j*/)
 
   if (setfl) cutmax = setfl->cut;
   cutforcesq = cutmax*cutmax;
-
   return cutmax;
 }
 
@@ -1028,4 +1035,11 @@ double PairADP::memory_usage()
   double bytes = Pair::memory_usage();
   bytes += (double)21 * nmax * sizeof(double);
   return bytes;
+}
+
+void *PairADP::extract(const char *str, int &dim)
+{
+    dim = 2;
+    if (strcmp(str,"scale") == 0) return (void *) scale;
+    return NULL;
 }

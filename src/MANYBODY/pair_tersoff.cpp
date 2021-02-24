@@ -60,7 +60,8 @@ PairTersoff::PairTersoff(LAMMPS *lmp) : Pair(lmp)
   params = nullptr;
   elem2param = nullptr;
   map = nullptr;
-
+  scale = nullptr;
+  
   maxshort = 10;
   neighshort = nullptr;
 }
@@ -83,6 +84,7 @@ PairTersoff::~PairTersoff()
     memory->destroy(setflag);
     memory->destroy(cutsq);
     memory->destroy(neighshort);
+    memory->destroy(scale);
     delete [] map;
   }
 }
@@ -213,6 +215,7 @@ void PairTersoff::eval()
 
       if (SHIFT_FLAG) fpair *= forceshiftfac;
 
+      fpair *= scale[1][1];
       fxtmp += delx*fpair;
       fytmp += dely*fpair;
       fztmp += delz*fpair;
@@ -278,6 +281,7 @@ void PairTersoff::eval()
       force_zeta(&params[iparam_ij],rsq1,zeta_ij,fforce,prefactor,EFLAG,evdwl);
 
       fpair = fforce*r1inv;
+      fpair *= scale[1][1];
 
       fxtmp += delr1[0]*fpair;
       fytmp += delr1[1]*fpair;
@@ -313,6 +317,13 @@ void PairTersoff::eval()
         attractive(&params[iparam_ijk],prefactor,
                    rsq1,rsq2,r1_hat,r2_hat,fi,fj,fk);
 
+        fj[0] *= scale[1][1];
+        fj[1] *= scale[1][1];
+        fj[2] *= scale[1][1];
+        fk[0] *= scale[1][1];
+        fk[1] *= scale[1][1];
+        fk[2] *= scale[1][1];
+
         fxtmp += fi[0];
         fytmp += fi[1];
         fztmp += fi[2];
@@ -347,6 +358,7 @@ void PairTersoff::allocate()
   memory->create(setflag,n+1,n+1,"pair:setflag");
   memory->create(cutsq,n+1,n+1,"pair:cutsq");
   memory->create(neighshort,maxshort,"pair:neighshort");
+  memory->create(scale,n+1,n+1,"pair:scale");
   map = new int[n+1];
 }
 
@@ -442,6 +454,7 @@ void PairTersoff::coeff(int narg, char **arg)
   for (i = 1; i <= n; i++)
     for (j = i; j <= n; j++)
       if (map[i] >= 0 && map[j] >= 0) {
+        scale[i][j] = 1.0;
         setflag[i][j] = 1;
         count++;
       }
@@ -474,7 +487,7 @@ void PairTersoff::init_style()
 double PairTersoff::init_one(int i, int j)
 {
   if (setflag[i][j] == 0) error->all(FLERR,"All pair coeffs are not set");
-
+  scale[j][i] = scale[i][j];
   return cutmax;
 }
 
@@ -876,4 +889,11 @@ void PairTersoff::costheta_d(double *rij_hat, double rijinv,
   scale3(rikinv,drk,drk);
   add3(drj,drk,dri);
   scale3(-1.0,dri);
+}
+
+void *PairTersoff::extract(const char *str, int &dim)
+{
+    dim = 2;
+    if (strcmp(str,"scale") == 0) return (void *) scale;
+    return NULL;
 }

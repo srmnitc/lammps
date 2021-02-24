@@ -33,6 +33,7 @@ class PairADP : public Pair {
   void coeff(int, char **);
   void init_style();
   double init_one(int, int);
+  virtual void *extract(const char *, int &);
 
   int pack_forward_comm(int, int *, double *, int, int *);
   void unpack_forward_comm(int, int, double *);
@@ -43,7 +44,7 @@ class PairADP : public Pair {
  protected:
   int nmax;                   // allocated size of per-atom arrays
   double cutforcesq,cutmax;
-
+  double **scale;
   // per-atom arrays
 
   double *rho,*fp;

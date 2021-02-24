@@ -34,6 +34,7 @@ public:
   virtual void init_style();
   virtual double init_one(int, int);
   virtual double memory_usage();
+  virtual void *extract(const char *, int &);
 
   double rcutfac, quadraticflag; // declared public to workaround gcc 4.9
   int ncoeff;                    //  compiler bug, manifest in KOKKOS package
@@ -64,6 +65,7 @@ protected:
   double rfac0, rmin0, wj1, wj2;
   int rcutfacflag, twojmaxflag; // flags for required parameters
   int beta_max;                 // length of beta
+  double **scale;
 };
 
 }
