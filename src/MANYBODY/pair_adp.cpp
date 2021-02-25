@@ -391,7 +391,7 @@ void PairADP::compute(int eflag, int vflag)
           f[j][2] -= fz;
         }
 
-        if (eflag) evdwl = phi;
+        if (eflag) evdwl = scale[itype][jtype]*phi;
         if (evflag) ev_tally_xyz(i,j,nlocal,newton_pair,evdwl,0.0,
                                  fx,fy,fz,delx,dely,delz);
       }

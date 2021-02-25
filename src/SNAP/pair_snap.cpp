@@ -235,6 +235,7 @@ void PairSNAP::compute(int eflag, int vflag)
           }
         }
       }
+      evdl *= scale[1][1];
       ev_tally_full(i,2.0*evdwl,0.0,0.0,0.0,0.0,0.0);
     }
 

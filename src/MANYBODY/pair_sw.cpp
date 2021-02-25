@@ -161,6 +161,8 @@ void PairSW::compute(int eflag, int vflag)
 
       twobody(&params[ijparam],rsq,fpair,eflag,evdwl);
 
+      //scale energy
+      if (eflag) evdwl *= scale[1][1];
       fpair *= scale[1][1];
       fxtmp += delx*fpair;
       fytmp += dely*fpair;
@@ -201,6 +203,7 @@ void PairSW::compute(int eflag, int vflag)
         threebody(&params[ijparam],&params[ikparam],&params[ijkparam],
                   rsq1,rsq2,delr1,delr2,fj,fk,eflag,evdwl);
 
+        if (eflag) evdwl *= scale[1][1];
         fj[0] *= scale[1][1];
         fj[1] *= scale[1][1];
         fj[2] *= scale[1][1];
