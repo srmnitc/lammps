@@ -215,7 +215,7 @@ void PairTersoff::eval()
 
       if (SHIFT_FLAG) fpair *= forceshiftfac;
 
-      if (eflag) evdwl *= scale[1][1];
+      if (EFLAG) evdwl *= scale[1][1];
       fpair *= scale[1][1];
       fxtmp += delx*fpair;
       fytmp += dely*fpair;
@@ -281,7 +281,7 @@ void PairTersoff::eval()
 
       force_zeta(&params[iparam_ij],rsq1,zeta_ij,fforce,prefactor,EFLAG,evdwl);
 
-      if (eflag) evdwl *= scale[1][1];
+      if (EFLAG) evdwl *= scale[1][1];
       fpair = fforce*r1inv;
       fpair *= scale[1][1];
 
